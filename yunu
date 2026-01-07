@@ -1,0 +1,118 @@
+mokil_web/
+├── app.py                 (홈 페이지)
+├── requirements.txt       (설정 파일)
+└── pages/                 (폴더)
+    ├── 1_🏫_School.py     (학교 소개)
+    ├── 2_🍱_Lunch.py      (오늘의 급식)
+    ├── 3_📅_Schedule.py   (시간표 및 일정)
+    └── 4_💬_Community.py  (자유게시판)
+import streamlit as st
+
+st.set_page_config(page_title="목일중학교", page_icon="🏫", layout="wide")
+
+# 헤더 디자인
+st.title("🏫 목일중학교 커뮤니티")
+st.markdown("### **바른 마음, 알찬 실력, 굳센 체력**")
+st.divider()
+
+# 메인 배너 및 공지
+col1, col2 = st.columns([2, 1])
+
+with col1:
+    st.image("https://via.placeholder.com/800x400.png?text=Mokil+Middle+School", caption="우리들의 행복한 배움터")
+
+with col2:
+    st.subheader("📢 최근 공지사항")
+    st.info("1. 2026학년도 학생회 선거 안내")
+    st.warning("2. 동아리 활동 신청 마감 임박")
+    st.success("3. 이번 주 금요일 학교 축제 개최!")
+
+st.balloons() # 접속 시 환영 효과
+import streamlit as st
+
+st.title("📍 학교 소개")
+
+tab1, tab2 = st.tabs(["학교 상징", "오시는 길"])
+
+with tab1:
+    st.subheader("교훈")
+    st.write("스스로 서고 함께 배우며 미래를 여는 목일인")
+    st.divider()
+    st.subheader("교화 & 교목")
+    col_a, col_b = st.columns(2)
+    col_a.metric("교화", "장미")
+    col_b.metric("교목", "느티나무")
+
+with tab2:
+    st.subheader("학교 위치")
+    st.write("서울특별시 양천구 신목로 25")
+    # 목일중 위도/경도 데이터
+    map_data = {"lat": [37.5186], "lon": [126.8725]}
+    st.map(map_data)
+import streamlit as st
+from datetime import datetime
+
+st.title("🍱 오늘의 급식")
+today = datetime.now().strftime("%Y년 %m월 %d일")
+st.subheader(f"📅 {today} 식단")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.image("https://via.placeholder.com/400x300.png?text=Today+Menu", caption="급식 이미지 샘플")
+
+with col2:
+    st.markdown("""
+    #### [오늘의 메뉴]
+    * 찰보리밥
+    * 얼큰닭곰탕
+    * **수제돈가스 & 소스** (인기!)
+    * 아삭이고추된장무침
+    * 포기김치
+    * 유기농 식혜
+    """)
+    st.caption("※ 식재료 수급 사정에 따라 메뉴가 변경될 수 있습니다.")
+import streamlit as st
+import pandas as pd
+
+st.title("📅 학사 일정 및 시간표")
+
+# 시간표 예시 데이터
+st.subheader("🏫 우리반 시간표 (예시)")
+schedule_data = {
+    "교시": ["1교시", "2교시", "3교시", "4교시", "5교시", "6교시", "7교시"],
+    "월": ["국어", "수학", "영어", "과학", "체육", "미술", "창체"],
+    "화": ["사회", "기가", "수학", "국어", "영어", "도덕", "-"],
+}
+df = pd.DataFrame(schedule_data)
+st.table(df)
+
+st.divider()
+st.subheader("📅 주요 학사 일정")
+st.write("- 3월 2일: 입학식")
+st.write("- 5월 1일: 현장체험학습")
+import streamlit as st
+
+st.title("💬 학생 자유게시판")
+st.caption("비속어 사용은 금지됩니다. 매너를 지켜주세요!")
+
+# 게시글 저장 저장소 초기화
+if "posts" not in st.session_state:
+    st.session_state.posts = []
+
+# 글쓰기 폼
+with st.expander("📝 글 쓰기", expanded=True):
+    with st.form("post_form", clear_on_submit=True):
+        name = st.text_input("닉네임", value="익명")
+        content = st.text_area("내용을 입력하세요")
+        submit = st.form_submit_button("등록")
+        
+        if submit and content:
+            st.session_state.posts.append({"name": name, "content": content})
+            st.rerun()
+
+# 게시글 목록 출력
+for p in reversed(st.session_state.posts):
+    with st.chat_message("user"):
+        st.write(f"**{p['name']}**")
+        st.write(p['content'])
