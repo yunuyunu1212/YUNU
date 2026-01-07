@@ -1,0 +1,64 @@
+import streamlit as st
+import pandas as pd
+from datetime import datetime
+
+# 페이지 설정
+st.set_page_config(page_title="목일중학교 커뮤니티", layout="wide")
+
+# 사이드바 메뉴
+menu = ["홈", "학교 소개", "오늘의 급식", "자유게시판"]
+choice = st.sidebar.selectbox("메뉴를 선택하세요", menu)
+
+# 1. 홈 화면
+if choice == "홈":
+    st.title("🏫 목일중학교에 오신 것을 환영합니다")
+    st.image("https://via.placeholder.com/800x400.png?text=Mokil+Middle+School") # 학교 사진 URL로 변경 가능
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader("📢 주요 공지사항")
+        st.write("- 2026학년도 신입생 배정 안내")
+        st.write("- 동아리 발표회 일정 변경 공지")
+    with col2:
+        st.subheader("📅 주요 학사 일정")
+        st.write("- 1월 15일: 겨울방학식")
+        st.write("- 3월 2일: 입학식 및 개학식")
+
+# 2. 학교 소개
+elif choice == "학교 소개":
+    st.header("📍 학교 위치 및 정보")
+    st.write("**교훈:** 바른 마음, 알찬 실력, 굳센 체력")
+    st.write("**주소:** 서울특별시 양천구 신목로 25")
+    # 지도 예시
+    st.map(pd.DataFrame({'lat': [37.518], 'lon': [126.872]}))
+
+# 3. 오늘의 급식
+elif choice == "오늘의 급식":
+    st.header("🍴 오늘의 식단")
+    today = datetime.now().strftime("%Y년 %m월 %d일")
+    st.info(f"날짜: {today}")
+    
+    # 예시 데이터 (나중에 NEIS API 연결 가능)
+    meals = ["잡곡밥", "쇠고기 미역국", "제육볶음", "배추김치", "사과"]
+    for food in meals:
+        st.write(f"- {food}")
+
+# 4. 자유게시판 (간이 기능)
+elif choice == "자유게시판":
+    st.header("📝 학생 자유게시판")
+    
+    if 'posts' not in st.session_state:
+        st.session_state.posts = []
+
+    with st.form("post_form"):
+        name = st.text_input("이름")
+        content = st.text_area("내용")
+        submit = st.form_submit_button("올리기")
+        
+        if submit and content:
+            st.session_state.posts.append({"name": name, "content": content, "time": datetime.now()})
+            st.success("게시글이 등록되었습니다!")
+
+    st.divider()
+    for post in reversed(st.session_state.posts):
+        st.write(f"**{post['name']}**: {post['content']} ({post['time'].strftime('%H:%M')})")
